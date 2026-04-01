@@ -59,6 +59,29 @@ export function Tasks() {
     if (data) setProfiles(data);
   };
 
+  const handleDeleteTask = async (taskId) => {
+    if (!window.confirm('Are you sure you want to delete this task?')) return;
+
+    // Optimistic Update: Remove from local state immediately
+    const originalTasks = [...tasks];
+    setTasks((prevTasks) => prevTasks.filter((t) => t.id !== taskId));
+
+    const { error } = await supabase
+      .from('tasks')
+      .delete()
+      .eq('id', taskId);
+
+    if (error) {
+      console.error('Error deleting task:', error.message);
+      alert('Failed to delete task: ' + error.message);
+      // Rollback on error
+      setTasks(originalTasks);
+    } else {
+      // Small re-fetch to ensure sync after the optimistic move if desired
+      // fetchTasks(); 
+    }
+  };
+
   const emailFor = (uuid) => {
     const p = profiles.find(p => p.id === uuid);
     return p?.full_name || p?.email || '—';
@@ -114,6 +137,7 @@ export function Tasks() {
                     task={task}
                     assignedEmail={emailFor(task.assigned_to)}
                     onStatusUpdate={fetchTasks}
+                    onDelete={handleDeleteTask}
                   />
                 ))}
               </div>
@@ -134,6 +158,7 @@ export function Tasks() {
                     task={task}
                     assignedEmail={emailFor(task.assigned_to)}
                     onStatusUpdate={fetchTasks}
+                    onDelete={handleDeleteTask}
                   />
                 ))}
               </div>
@@ -154,6 +179,7 @@ export function Tasks() {
                     task={task}
                     assignedEmail={emailFor(task.assigned_to)}
                     onStatusUpdate={fetchTasks}
+                    onDelete={handleDeleteTask}
                   />
                 ))}
               </div>

@@ -23,7 +23,7 @@ const STATUS_COLOR = {
   completed: 'bg-green-100 text-green-700',
 };
 
-export function TaskCard({ task, assignedEmail, onStatusUpdate }) {
+export function TaskCard({ task, assignedEmail, onStatusUpdate, onDelete }) {
   const { user, role } = useAuth();
   const navigate = useNavigate();
   const [showUpload, setShowUpload] = useState(false);
@@ -44,21 +44,9 @@ export function TaskCard({ task, assignedEmail, onStatusUpdate }) {
     }
   };
 
-  const handleDelete = async (e) => {
+  const handleDelete = (e) => {
     e.stopPropagation();
-    if (!window.confirm('Are you sure you want to delete this task?')) return;
-
-    const { error } = await supabase
-      .from('tasks')
-      .delete()
-      .eq('id', task.id);
-
-    if (error) {
-      console.error('Error deleting task:', error.message);
-      alert('Failed to delete task: ' + error.message);
-    } else {
-      if (onStatusUpdate) onStatusUpdate();
-    }
+    if (onDelete) onDelete(task.id);
   };
 
   return (
