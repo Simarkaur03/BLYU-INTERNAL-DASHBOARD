@@ -64,7 +64,7 @@ export function Tasks() {
     return p?.full_name || p?.email || '—';
   };
   {
-    isAdmin && (
+    role === 'admin' && (
       <button onClick={() => handleDeleteTask(task.id)}>
         Remove Task
       </button>
