@@ -1,7 +1,7 @@
 import { useAuth } from '../../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../supabaseclient';
-import { Paperclip } from 'lucide-react';
+import { Paperclip, Trash2 } from 'lucide-react';
 import { FileUpload } from '../../../components/FileUpload';
 import { useState } from 'react';
 
@@ -44,6 +44,23 @@ export function TaskCard({ task, assignedEmail, onStatusUpdate }) {
     }
   };
 
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this task?')) return;
+
+    const { error } = await supabase
+      .from('tasks')
+      .delete()
+      .eq('id', task.id);
+
+    if (error) {
+      console.error('Error deleting task:', error.message);
+      alert('Failed to delete task: ' + error.message);
+    } else {
+      if (onStatusUpdate) onStatusUpdate();
+    }
+  };
+
   return (
     <div
       onClick={() => navigate(`/tasks/${task.id}`)}
@@ -79,6 +96,16 @@ export function TaskCard({ task, assignedEmail, onStatusUpdate }) {
           >
             <Paperclip className="w-4 h-4" />
           </button>
+          
+          {role === 'admin' && (
+            <button
+              onClick={handleDelete}
+              className="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-colors"
+              title="Delete task"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
           
           <select
             value={task.status}

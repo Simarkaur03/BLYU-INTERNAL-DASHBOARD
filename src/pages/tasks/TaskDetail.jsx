@@ -131,6 +131,22 @@ export function TaskDetail() {
     else alert('Could not generate a link for this file.');
   }
 
+  async function handleDeleteTask() {
+    if (!window.confirm('Are you sure you want to delete this task?')) return;
+
+    const { error } = await supabase
+      .from('tasks')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting task:', error.message);
+      alert('Failed to delete task: ' + error.message);
+    } else {
+      navigate('/tasks');
+    }
+  }
+
   if (loading) return <p className="text-sm text-slate-400 p-4">Loading…</p>;
   if (!task) return null;
 
@@ -163,6 +179,15 @@ export function TaskDetail() {
             </select>
           ) : (
             <StatusBadge status={task.status} />
+          )}
+
+          {role === 'admin' && (
+            <button
+              onClick={handleDeleteTask}
+              className="px-3 py-1 bg-red-50 text-red-600 border border-red-200 text-xs font-semibold rounded-full hover:bg-red-100 transition-colors"
+            >
+              Delete Task
+            </button>
           )}
         </div>
 

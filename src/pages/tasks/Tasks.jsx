@@ -63,25 +63,8 @@ export function Tasks() {
     const p = profiles.find(p => p.id === uuid);
     return p?.full_name || p?.email || '—';
   };
-  {
-    role === 'admin' && (
-      <button onClick={() => handleDeleteTask(task.id)}>
-        Remove Task
-      </button>
-    )
-  }
-  const handleDeleteTask = async (taskId) => {
-    const { error } = await supabase
-      .from('tasks')
-      .delete()
-      .eq('id', taskId)
 
-    if (error) {
-      console.error('Delete error:', error)
-    } else {
-      setTasks(tasks.filter(t => t.id !== taskId))
-    }
-  }
+
 
   const inProgressTasks = tasks.filter(t => t.status === 'in_progress');
   const pendingTasks = tasks.filter(t => t.status === 'pending');
