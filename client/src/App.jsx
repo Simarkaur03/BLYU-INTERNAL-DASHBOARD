@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppLayout } from './components/layout/AppLayout';
 import { RouteGuard } from './components/RouteGuard';
@@ -22,38 +22,36 @@ function RoleRedirect() {
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+    <AuthProvider>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
-          {/* All protected routes share the AppLayout shell (auth guard is in AppLayout) */}
-          <Route element={<AppLayout />}>
-            {/* Root → role-aware landing */}
-            <Route path="/" element={<RoleRedirect />} />
+        {/* All protected routes share the AppLayout shell (auth guard is in AppLayout) */}
+        <Route element={<AppLayout />}>
+          {/* Root → role-aware landing */}
+          <Route path="/" element={<RoleRedirect />} />
 
-            {/* Admin-only Overview page */}
-            <Route
-              path="/dashboard"
-              element={
-                <RouteGuard adminOnly>
-                  <Dashboard />
-                </RouteGuard>
-              }
-            />
+          {/* Admin-only Overview page */}
+          <Route
+            path="/dashboard"
+            element={
+              <RouteGuard adminOnly>
+                <Dashboard />
+              </RouteGuard>
+            }
+          />
 
-            <Route path="/tasks" element={<Tasks />} />
-            <Route path="/tasks/:id" element={<TaskDetail />} />
-            <Route path="/progress" element={<Progress />} />
-            <Route path="/history" element={<MyHistory />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/tasks/:id" element={<TaskDetail />} />
+          <Route path="/progress" element={<Progress />} />
+          <Route path="/history" element={<MyHistory />} />
 
-            {/* Catch-all → role-aware redirect (inside AppLayout so auth guard runs) */}
-            <Route path="*" element={<RoleRedirect />} />
-          </Route>
-        </Routes>
-      </AuthProvider>
-    </Router>
+          {/* Catch-all → role-aware redirect (inside AppLayout so auth guard runs) */}
+          <Route path="*" element={<RoleRedirect />} />
+        </Route>
+      </Routes>
+    </AuthProvider>
   );
 }
 
