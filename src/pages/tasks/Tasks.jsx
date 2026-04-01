@@ -66,19 +66,32 @@ export function Tasks() {
     const originalTasks = [...tasks];
     setTasks((prevTasks) => prevTasks.filter((t) => t.id !== taskId));
 
-    const { error } = await supabase
-      .from('tasks')
-      .delete()
-      .eq('id', taskId);
+    try {
+      // Step 1: Explicitly delete related records to prevent foreign key issues
+      // These tables might not have "ON DELETE CASCADE" set up
+      await supabase.from('task_attachments').delete().eq('task_id', taskId);
+      await supabase.from('progress_logs').delete().eq('task_id', taskId);
 
-    if (error) {
+      // Step 2: Delete the task and use .select() to confirm if rows were affected
+      const { data, error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', taskId)
+        .select();
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        // This usually happens if the ID doesn't exist or RLS blocks the delete
+        console.warn('Deletion failed: No rows affected.');
+        alert('Permission Denied: You do not have permission to delete this task.');
+        setTasks(originalTasks);
+      }
+    } catch (error) {
       console.error('Error deleting task:', error.message);
       alert('Failed to delete task: ' + error.message);
       // Rollback on error
       setTasks(originalTasks);
-    } else {
-      // Small re-fetch to ensure sync after the optimistic move if desired
-      // fetchTasks(); 
     }
   };
 

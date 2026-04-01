@@ -134,16 +134,28 @@ export function TaskDetail() {
   async function handleDeleteTask() {
     if (!window.confirm('Are you sure you want to delete this task?')) return;
 
-    const { error } = await supabase
-      .from('tasks')
-      .delete()
-      .eq('id', id);
+    try {
+      // Step 1: Explicitly delete related records
+      await supabase.from('task_attachments').delete().eq('task_id', id);
+      await supabase.from('progress_logs').delete().eq('task_id', id);
 
-    if (error) {
-      console.error('Error deleting task:', error.message);
-      alert('Failed to delete task: ' + error.message);
-    } else {
-      navigate('/tasks');
+      // Step 2: Delete the task and confirm rows affected
+      const { data, error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', id)
+        .select();
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        alert('Permission Denied: You do not have permission to delete this task.');
+      } else {
+        navigate('/tasks');
+      }
+    } catch (err) {
+      console.error('Error deleting task:', err.message);
+      alert('Failed to delete task: ' + err.message);
     }
   }
 
