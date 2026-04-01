@@ -216,6 +216,10 @@ RLS is **enabled** on all four tables. Below is a summary of who can do what:
 | SELECT | Any authenticated user |
 | INSERT | Admins only |
 | UPDATE | Admins, OR the user the task is assigned to |
+| DELETE | Qualquer usuário autenticado (gerenciado pela UI) / Admins |
+
+> [!NOTE]
+> Added `DELETE` policy to resolve permission errors.
 | DELETE | Admins only |
 
 ### `progress_logs`
@@ -224,7 +228,7 @@ RLS is **enabled** on all four tables. Below is a summary of who can do what:
 |---|---|
 | SELECT | Any authenticated user |
 | INSERT | Only the user inserting their own log (`user_id = auth.uid()`) |
-| DELETE | Admins only |
+| DELETE | Qualquer usuário autenticado (gerenciado pela UI) / Admins |
 
 ### `notifications`
 

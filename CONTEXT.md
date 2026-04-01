@@ -193,6 +193,7 @@ window.open(data.signedUrl, '_blank');
 CREATE POLICY "tasks_select" ON tasks FOR SELECT TO authenticated USING (true);
 CREATE POLICY "tasks_insert" ON tasks FOR INSERT TO authenticated WITH CHECK (true);
 CREATE POLICY "tasks_update" ON tasks FOR UPDATE TO authenticated USING (true);
+CREATE POLICY "tasks_delete" ON tasks FOR DELETE TO authenticated USING (true);
 ```
 > Role enforcement is handled in the UI. Open policies prevent FK-related permission errors.
 
@@ -200,6 +201,7 @@ CREATE POLICY "tasks_update" ON tasks FOR UPDATE TO authenticated USING (true);
 ```sql
 CREATE POLICY "read_logs"       ON progress_logs FOR SELECT TO authenticated USING (true);
 CREATE POLICY "insert_own_logs" ON progress_logs FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "logs_delete"     ON progress_logs FOR DELETE TO authenticated USING (true);
 ```
 
 ### `task_attachments`
